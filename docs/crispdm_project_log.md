@@ -17,15 +17,38 @@
 - Automated detection of high-impact events.
 - Scalable and modular backend with good documentation.
 
+### 1.3 Situation Assessment
+
+The current process of monitoring competitors in the LATAM financial sector is manual and scattered across various sources (news portals, company websites, reports, etc.). This makes it time-consuming, reactive, and limited in scope.
+
+The objective of this project is to centralize and automate this process using AI, enabling faster and deeper strategic analysis.
+
+Key constraints:
+- Limited availability of structured data.
+- Varying frequency and quality of information across companies.
+- Need to balance automation with reliability.
+
+### 1.4 Data Mining Goals
+
+- Apply natural language processing to extract strategic events from unstructured text (news, blog posts).
+- Generate vector embeddings to support semantic similarity search and retrieval.
+- Classify content by relevance using rule-based or supervised methods.
+- Develop agents that can route tasks, validate inputs, and interface with APIs.
+
 ---
 
 ## 2. Data Understanding
 
 ### 2.1 Data Sources
-- Websites of each company.
-- News portals (scraping / RSS).
-- APIs from Central Banks (Costa Rica, México, etc.).
-- Optional: social media or job listings in future iterations.
+
+#### 2.1.1 Nubank
+
+There is not a RSS or API to obtain these Nubank' news, so the information process has to be obtained through a standard web scrapping process.
+
+Nubank has an official site where all the relevant company news are publish [text](https://international.nubank.com.br/es/files/), which makes it easier to obtain the news links for a long period of time. The srapping process is relatevly simple and there is no dynamic content, which simplifies the process.
+
+Each of the news sites contains a title, a short summary explaining what the news is about, date of the article and the text. Initially, the first paragraph contains good information of what the articile is about and is good companing for the summary of the article.
+
 
 ### 2.2 Initial Observations
 - [ ] Example: Nubank website has frequent blog/news updates.
