@@ -48,10 +48,22 @@ class UalaScraper:
             if not h1_tags: 
                 titles.append('')
             else:
-                titles.append(h1_tags[0].text.strip())                
+                titles.append(h1_tags[0].text.strip())
             h3_tags = page.find_all('h3')
             if not h3_tags:
-                summaries.append('')
+                if self.country == 'mx':
+                    h4_tags = page.find_all('h4')
+                    if not h4_tags:
+                        ul_tags = page.find_all('li')
+                        if not ul_tags:
+                            summaries.append('')
+                        else:
+                          ul_tags_all = ul_tags[0].text.strip() + ' ' + ul_tags[1].text.strip()
+                          summaries.append(ul_tags_all)
+                    else:
+                          summaries.append(h4_tags[0].text.strip())
+                else:
+                    summaries.append('')
             elif len(h3_tags) > 1:
                 summaries.append(h3_tags[0].text.strip() + ' ' + h3_tags[1].text.strip())
             else:
@@ -64,7 +76,10 @@ class UalaScraper:
                 paragraph = paragraph_tags[1] if not paragraph_tags[0].find_all('strong') else paragraph_tags[0]
                 paragraphs.append(paragraph.text.strip())
                 if not paragraph.find_all('strong'):
-                    dates.append('')
+                    if self.country == 'mx':
+                        dates.append(paragraph_tags[0].text.strip())
+                    else:
+                         dates.append('')
                 else:
                     dates.append(paragraph.find_all('strong')[0].text.strip())
             print(f"    Progress: {str(round((i/len(self.links))*100,0)) + '%'}", end="\r", flush=True)
