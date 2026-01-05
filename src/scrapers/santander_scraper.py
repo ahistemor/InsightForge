@@ -10,10 +10,10 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
+import re
 import ssl
 
 options = Options()
-# options.add_argument('--headless')  # Uncomment to run in headless mode
 
 service = Service(GeckoDriverManager().install())
 driver = webdriver.Firefox(service=service, options=options)
@@ -64,6 +64,73 @@ df = pd.DataFrame({
 })
 
 df.to_csv('data/santander_news.csv', index=False, encoding='utf-8')
+
+df = pd.read_csv("data/santander_news.csv")
+
+paragraphs = []
+review_summaries = []
+k = 0
+
+text_base = "Dicha cotización se muestra con una demora de hasta 15 minutos y en la hora local del mercado en el cual se muestra la cotización."
+
+for site in df["link"]:
+    url = requests.get(site).text
+    page = BeautifulSoup(url, 'html.parser')   
+
+    temp_summary = []
+    
+    span_tags_opening = page.find_all('span', {'class' : 'opening-entry'})
+    span_tags_entradilla = page.find_all('span', {'class' : 'entradilla-risk-entry'})
+    
+    if span_tags_opening:
+        span_tags = span_tags_opening
+    elif span_tags_entradilla:
+        span_tags = span_tags_entradilla
+    else:
+        temp_summary = ''
+        
+    if span_tags and temp_summary != '':
+        for elem in span_tags_opening:
+            temp_summary.append(elem.text.strip())
+            
+        if len(temp_summary) > 1:
+            temp_summary = ' '.join(temp_summary)
+        else:
+            temp_summary = temp_summary[0]
+        
+    review_summaries.append(temp_summary)
+    
+    remove_elements = page.find_all(class_ = "opening-entry")
+    for element in remove_elements:
+        element.decompose()
+    
+    all_paragraphs = page.select('.cmp-text p p')
+    
+    for paragraph in all_paragraphs:
+        text = paragraph.text.strip()
+        text = text.replace('\xa0', ' ').strip()
+        text = text.replace(text_base, '')
+        text = re.sub(r'\s+', ' ', text).strip()
+        if text != text_base and text != '' and text != df["title"][k] and df["summary"][k]:
+            paragraphs.append(text)
+            break
+
+    #k += 1
+    #if k > 10:
+        #break
+
+df["paragraph"] = paragraphs
+
+df.to_csv('data/santander_news.csv', index=False, encoding='utf-8')
+
+
+
+
+
+
+
+
+
 
 
 
