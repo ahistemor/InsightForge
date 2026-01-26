@@ -34,28 +34,36 @@ for page in news_pages:
         break
 
 
+df = pd.DataFrame({'link': links, 'title': titles, 'date': dates})
+
+def obtainParagraphs(html_element):
+    union_paragraph = []    
+    for paragraph in html_element:
+        text = paragraph.text.strip()        
+        if text != '':
+            union_paragraph.append(text)
+        if len(union_paragraph) > 4: #only 4 paragraphs are extracted
+            break
+    union_paragraph = ' '.join(union_paragraph)
+    return union_paragraph
 
 paragraphs = []
 
 for link in df["link"]:
     url = requests.get(link).text
     page = BeautifulSoup(url, 'html.parser')
-    page_paragraph = page.find_all('div', {'class': 'news__col-two'})[0].find_all('p')
-    union_paragraph = []
-    for paragraph in page_paragraph:
-        text = paragraph.text.strip()
-        if text != '':
-            union_paragraph.append(text)
-        if len(union_paragraph) > 4: #only 4 paragraphs are extracted
-            break
-    union_paragraph = ' '.join(union_paragraph)    
+    union_paragraph = obtainParagraphs(page.find_all('div', {'class': 'news__col-two'})[0].find_all('p'))
+    if union_paragraph == '':
+        union_paragraph = obtainParagraphs(page.find_all('div', {'class': 'news__col-two'})[0].find_all('div')[0].find_all('div'))    
     paragraphs.append(union_paragraph)
+    #k += 1
+    #if k > 7:
+        #break
+
 
 df = pd.DataFrame({'link': links, 'title': titles, 'date': dates, 'paragraph': paragraphs})
 
 df.to_csv('data/bac_news.csv', index=False, encoding='utf-8')
-
-
 
 
 
